@@ -1,136 +1,75 @@
 import pygame
-import sys
+import sqlite3
 
-# Initialize Pygame
+# 데이터베이스 연결
+conn = sqlite3.connect('character.db')
+cursor = conn.cursor()
+
+# 데이터베이스 테이블 생성
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS character (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        eye_color TEXT,
+        size INTEGER
+    )
+''')
+conn.commit()
+
+# 캐릭터 정보 조회 예시
+cursor.execute('SELECT * FROM character')
+result = cursor.fetchall()
+for row in result:
+    print(row)
+
+# pygame 초기화
 pygame.init()
 
-# Set up the window
-width, height = 800, 600
+# 창 크기 설정
+width = 800
+height = 600
 screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("RPG Game")
+pygame.display.set_caption("Character Customization")
 
-# Define colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+# 캐릭터 이미지 로드
+character_image = pygame.image.load("character.png")  # 이미지 파일 경로에 맞게 수정해주세요.
 
-# Define font
-font = pygame.font.Font(None, 36)
+# 눈 색깔 리스트
+eye_colors = ['blue', 'green', 'brown']
 
-def start_page():
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                
-                if start_button.collidepoint(mouse_pos):
-                    next_page()
-                elif end_button.collidepoint(mouse_pos):
-                    pygame.quit()
-                    sys.exit()
+# 현재 눈 색깔 인덱스
+current_eye_color_index = 0
 
-        # Clear the screen
-        screen.fill(WHITE)
-        
-        # Draw the start button
-        start_button = pygame.Rect(300, 200, 200, 50)
-        pygame.draw.rect(screen, BLACK, start_button)
-        start_text = font.render("Start", True, WHITE)
-        start_text_rect = start_text.get_rect(center=start_button.center)
-        screen.blit(start_text, start_text_rect)
-        
-        # Draw the end button
-        end_button = pygame.Rect(300, 300, 200, 50)
-        pygame.draw.rect(screen, BLACK, end_button)
-        end_text = font.render("End", True, WHITE)
-        end_text_rect = end_text.get_rect(center=end_button.center)
-        screen.blit(end_text, end_text_rect)
-        
-        # Update the display
-        pygame.display.flip()
+# 캐릭터 정보 업데이트 함수
+def update_character():
+    # 데이터베이스 업데이트
+    cursor.execute('UPDATE character SET eye_color = ? WHERE id = ?', (eye_colors[current_eye_color_index], 1))
+    conn.commit()
 
-def next_page():
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                
-                if level_button.collidepoint(mouse_pos):
-                    # Level button clicked, go to level selection page
-                    # Add your code for transitioning to the level selection page here
-                    level_page()
-                elif customize_button.collidepoint(mouse_pos):
-                    # Customize button clicked, go to customization page
-                    # Add your code for transitioning to the customization page here
-                    next_page()
+# 게임 루프
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            # 눈 색깔 변경
+            if event.key == pygame.K_SPACE:
+                current_eye_color_index = (current_eye_color_index + 1) % len(eye_colors)
+                update_character()
 
-        # Clear the screen
-        screen.fill(WHITE)
-        
-        # Draw the level button
-        level_button = pygame.Rect(300, 200, 200, 50)
-        pygame.draw.rect(screen, BLACK, level_button)
-        level_text = font.render("Level", True, WHITE)
-        level_text_rect = level_text.get_rect(center=level_button.center)
-        screen.blit(level_text, level_text_rect)
-        
-        # Draw the customize button
-        customize_button = pygame.Rect(300, 300, 200, 50)
-        pygame.draw.rect(screen, BLACK, customize_button)
-        customize_text = font.render("Customize", True, WHITE)
-        customize_text_rect = customize_text.get_rect(center=customize_button.center)
-        screen.blit(customize_text, customize_text_rect)
-        
-        # Update the display
-        pygame.display.flip()
+    # 화면 그리기
+    screen.fill((255, 255, 255))  # 배경색
 
-def level_page():
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                
-                if  hard_button.collidepoint(mouse_pos):
-                    next_page()
-                elif normal_button.collidepoint(mouse_pos):
-                    next_page()
-                elif easy_button.collidepoint(mouse_pos):
-                    next_page()
-        # Clear the screen
-        screen.fill(WHITE)
-        
-        # Draw the hard button
-        hard_button = pygame.Rect(300, 200, 200, 50)
-        pygame.draw.rect(screen, BLACK, hard_button)
-        hard_text = font.render("HARD", True, WHITE)
-        hard_text_rect = hard_text.get_rect(center=hard_button.center)
-        screen.blit(hard_text, hard_text_rect)
-        
-        # Draw the normal button
-        normal_button = pygame.Rect(300, 300, 200, 50)
-        pygame.draw.rect(screen, BLACK, normal_button)
-        normal_text = font.render("NORMAL", True, WHITE)
-        normal_text_rect = normal_text.get_rect(center=normal_button.center)
-        screen.blit(normal_text, normal_text_rect)
+    # 캐릭터 이미지 그리기
+    screen.blit(character_image, (width // 2 - character_image.get_width() // 2, height // 2 - character_image.get_height() // 2))
 
-        # Draw the easy button
-        easy_button = pygame.Rect(300, 400, 200, 50)
-        pygame.draw.rect(screen, BLACK, easy_button)
-        easy_text = font.render("EASY", True, WHITE)
-        easy_text_rect = easy_text.get_rect(center=easy_button.center)
-        screen.blit(easy_text, easy_text_rect)
-        
-        # Update the display
-        pygame.display.flip()
+    # 눈 색깔 변경
+    eye_color = eye_colors[current_eye_color_index]
+    pygame.draw.circle(screen, eye_color, (width // 2 + 50, height // 2 - 50), 10)  # 캐릭터의 눈
 
-    
-# Call the start_page function to display the start page
-start_page()
+    pygame.display.flip()
+
+# 게임 종료
+pygame.quit()
+conn.close()

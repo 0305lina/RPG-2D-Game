@@ -1,136 +1,92 @@
 import pygame
 import sys
 
-# Initialize Pygame
+# Pygame 초기화
 pygame.init()
 
-# Set up the window
-width, height = 800, 600
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("RPG Game")
+# 창 크기 설정
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("게임 제목")
 
-# Define colors
+# 색깔 정의
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
-# Define font
-font = pygame.font.Font(None, 36)
+# 유저 아이디 및 비밀번호 생성 창
+def show_login_screen():
+    done = False
+    clock = pygame.time.Clock()
+    font = pygame.font.Font(None, 36)
 
-def start_page():
-    while True:
+    input_id = ""
+    input_password = ""
+
+    while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                
-                if start_button.collidepoint(mouse_pos):
-                    next_page()
-                elif end_button.collidepoint(mouse_pos):
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN and input_id and input_password:
+                    done = True  # Done 버튼을 엔터 키로 대체
+                elif event.key == pygame.K_END:
                     pygame.quit()
                     sys.exit()
+                else:
+                    if len(input_id) < 20 and event.key != pygame.K_RETURN:
+                        input_id += event.unicode
+                    if len(input_password) < 20 and event.key != pygame.K_RETURN:
+                        input_password += event.unicode
 
-        # Clear the screen
         screen.fill(WHITE)
-        
-        # Draw the start button
-        start_button = pygame.Rect(300, 200, 200, 50)
-        pygame.draw.rect(screen, BLACK, start_button)
-        start_text = font.render("Start", True, WHITE)
-        start_text_rect = start_text.get_rect(center=start_button.center)
-        screen.blit(start_text, start_text_rect)
-        
-        # Draw the end button
-        end_button = pygame.Rect(300, 300, 200, 50)
-        pygame.draw.rect(screen, BLACK, end_button)
+        # 아이디 및 비밀번호 입력 란 그리기
+        pygame.draw.rect(screen, BLACK, (screen_width // 2 - 100, 200, 200, 40))
+        pygame.draw.rect(screen, BLACK, (screen_width // 2 - 100, 300, 200, 40))
+
+        # 아이디 및 비밀번호 텍스트 그리기
+        id_text = font.render("ID: " + input_id, True, BLACK)
+        screen.blit(id_text, (screen_width // 2 - 100, 180))
+
+        password_text = font.render("Password: " + "*" * len(input_password), True, BLACK)
+        screen.blit(password_text, (screen_width // 2 - 100, 280))
+
+        # Done 버튼 그리기
+        pygame.draw.rect(screen, BLACK, (screen_width // 2 - 50, 400, 100, 40))
+        done_text = font.render("Done", True, WHITE)
+        screen.blit(done_text, (screen_width // 2 - 30, 410))
+
+        # End 버튼 그리기
+        pygame.draw.rect(screen, RED, (screen_width // 2 - 50, 460, 100, 40))
         end_text = font.render("End", True, WHITE)
-        end_text_rect = end_text.get_rect(center=end_button.center)
-        screen.blit(end_text, end_text_rect)
-        
-        # Update the display
-        pygame.display.flip()
+        screen.blit(end_text, (screen_width // 2 - 30, 470))
 
-def next_page():
-    while True:
+        pygame.display.flip()
+        clock.tick(60)
+
+    show_next_page()
+
+# 다음 페이지
+def show_next_page():
+    done = False
+    clock = pygame.time.Clock()
+
+    while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                
-                if level_button.collidepoint(mouse_pos):
-                    # Level button clicked, go to level selection page
-                    # Add your code for transitioning to the level selection page here
-                    level_page()
-                elif customize_button.collidepoint(mouse_pos):
-                    # Customize button clicked, go to customization page
-                    # Add your code for transitioning to the customization page here
-                    next_page()
 
-        # Clear the screen
-        screen.fill(WHITE)
-        
-        # Draw the level button
-        level_button = pygame.Rect(300, 200, 200, 50)
-        pygame.draw.rect(screen, BLACK, level_button)
-        level_text = font.render("Level", True, WHITE)
-        level_text_rect = level_text.get_rect(center=level_button.center)
-        screen.blit(level_text, level_text_rect)
-        
-        # Draw the customize button
-        customize_button = pygame.Rect(300, 300, 200, 50)
-        pygame.draw.rect(screen, BLACK, customize_button)
-        customize_text = font.render("Customize", True, WHITE)
-        customize_text_rect = customize_text.get_rect(center=customize_button.center)
-        screen.blit(customize_text, customize_text_rect)
-        
-        # Update the display
+        screen.fill(BLACK)
+        # 다음 페이지의 내용 그리기
+
         pygame.display.flip()
+        clock.tick(60)
 
-def level_page():
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                
-                if  hard_button.collidepoint(mouse_pos):
-                    next_page()
-                elif normal_button.collidepoint(mouse_pos):
-                    next_page()
-                elif easy_button.collidepoint(mouse_pos):
-                    next_page()
-        # Clear the screen
-        screen.fill(WHITE)
-        
-        # Draw the hard button
-        hard_button = pygame.Rect(300, 200, 200, 50)
-        pygame.draw.rect(screen, BLACK, hard_button)
-        hard_text = font.render("HARD", True, WHITE)
-        hard_text_rect = hard_text.get_rect(center=hard_button.center)
-        screen.blit(hard_text, hard_text_rect)
-        
-        # Draw the normal button
-        normal_button = pygame.Rect(300, 300, 200, 50)
-        pygame.draw.rect(screen, BLACK, normal_button)
-        normal_text = font.render("NORMAL", True, WHITE)
-        normal_text_rect = normal_text.get_rect(center=normal_button.center)
-        screen.blit(normal_text, normal_text_rect)
+# 유저 아이디 및 비밀번호 생성 창을 보여줌
+show_login_screen()
 
-        # Draw the easy button
-        easy_button = pygame.Rect(300, 400, 200, 50)
-        pygame.draw.rect(screen, BLACK, easy_button)
-        easy_text = font.render("EASY", True, WHITE)
-        easy_text_rect = easy_text.get_rect(center=easy_button.center)
-        screen.blit(easy_text, easy_text_rect)
-        
-        # Update the display
-        pygame.display.flip()
-
-    
-# Call the start_page function to display the start page
-start_page()
+# Pygame 종료
+pygame.quit()
