@@ -1,74 +1,79 @@
 import pygame
-from sys import exit
 
-# Initiates all the function related to pygame
-pygame.init()
-# Display surface of the screen (width, height)
-screen = pygame.display.set_mode((800, 400))
-# Update title of the surface
-pygame.display.set_caption('RPG 2D Academic Game')
-# Control frame break
-clock = pygame.time.Clock()
-test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
+def character_selection():
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption("Character Selection")
 
-# Background
-sky_surf = pygame.image.load('graphic/sky.png').convert()
-sky_surf = pygame.transform.scale(sky_surf, (800, 280))
-ground_surf = pygame.image.load('graphic/ground.png').convert()
+def character_selection():
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption("Character Selection")
 
-score_surf = test_font.render('Start the Game', False, (64, 64, 64))
-score_rect = score_surf.get_rect(center = (400, 50))
+    # 캐릭터 이미지 로드
+    rabbit_img = pygame.image.load('spaceship1.png')
+    bear_img = pygame.image.load('spaceship1.png')
+    dog_img = pygame.image.load('spaceship1.png')
 
-#Character
-snoopy_surf = pygame.image.load('graphic/snoopy.png').convert_alpha()
-snoopy_surf = pygame.transform.scale(snoopy_surf, (100, 80))
-snoopy_x_pos = 0
-snoopy_rect = snoopy_surf.get_rect(midbottom = (50, 280))
-snoopy_grav = 0
+    # 기본 이미지 크기와 선택된 이미지 크기 설정
+    default_size = (200, 200)
+    selected_size = (200, 200)
 
-cat_surf = pygame.image.load('graphic/cat.png')
-cat_surf = pygame.transform.scale(cat_surf, (100, 80))
-cat_rect = cat_surf.get_rect(bottomright = (750, 280))
+    # 캐릭터 이미지 버튼 생성 (위치와 크기를 이미지와 동일하게)
+    rabbit_button = pygame.Rect(100, 200, rabbit_img.get_width(), rabbit_img.get_height())
+    bear_button = pygame.Rect(300, 200, bear_img.get_width(), bear_img.get_height())
+    dog_button = pygame.Rect(500, 200, dog_img.get_width(), dog_img.get_height())
 
+    # 선택된 캐릭터 초기화
+    selected_character = None
 
-# This game will run forever in this loop
-while True:
-    for event in pygame.event.get():
-        # pygame.QUIT is x button
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-        # Button press -> check collision is more efficient
-        if event.type == pygame.MOUSEBUTTONDOWN and snoopy_rect.bottom >= 280:
-            if snoopy_rect.collidepoint(event.pos):
-                snoopy_grav = -20
+    done_button_rect = pygame.Rect(300, 500, 200, 50)
 
-        # Only allow jump when the player is on the ground
-        if event.type == pygame.KEYDOWN and snoopy_rect.bottom >= 280:
-            if event.key == pygame.K_SPACE:
-                snoopy_grav = -20
-        
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if done_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    if selected_character:
+                        pygame.quit()
+                        return
+                # 캐릭터 이미지 버튼 클릭 시 선택된 캐릭터 변경 또는 선택 취소
+                elif rabbit_button.collidepoint(pygame.mouse.get_pos()):
+                    if selected_character == rabbit_img:
+                        selected_character = None  # 선택 취소
+                    else:
+                        selected_character = rabbit_img
+                elif bear_button.collidepoint(pygame.mouse.get_pos()):
+                    if selected_character == bear_img:
+                        selected_character = None  # 선택 취소
+                    else:
+                        selected_character = bear_img
+                elif dog_button.collidepoint(pygame.mouse.get_pos()):
+                    if selected_character == dog_img:
+                        selected_character = None  # 선택 취소
+                    else:
+                        selected_character = dog_img
 
-    #block image transfer (one surface on another surface)
-    screen.blit(ground_surf, (-10,120))
-    screen.blit(sky_surf, (0,0))
-    pygame.draw.rect(screen, '#c0e8ec', score_rect)
-    pygame.draw.rect(screen, '#c0e8ec', score_rect, 50)
-    screen.blit(score_surf, score_rect)
-    cat_rect.x -= 3
-    if cat_rect.right <= 0:
-        cat_rect.left = 800
-    screen.blit(cat_surf,cat_rect)
-    snoopy_rect.left += 1
+        # 배경 화면 그리기
+        screen.fill((255, 255, 255))
 
-    # Player
-    snoopy_grav += 1
-    snoopy_rect.y += snoopy_grav
-    if snoopy_rect.bottom >= 280:
-        snoopy_rect.bottom = 280
-    screen.blit(snoopy_surf, snoopy_rect)
+        # 캐릭터 이미지 버튼 그리기 (선택된 캐릭터는 크기가 커짐)
+        screen.blit(pygame.transform.scale(rabbit_img, selected_size if selected_character == rabbit_img else default_size), rabbit_button.topleft)
+        screen.blit(pygame.transform.scale(bear_img, selected_size if selected_character == bear_img else default_size), bear_button.topleft)
+        screen.blit(pygame.transform.scale(dog_img, selected_size if selected_character == dog_img else default_size), dog_button.topleft)
 
-    #draw all our elements
-    #update everything
-    pygame.display.update() 
-    clock.tick(60) #ceiling == Frame Rate
+        # Done 버튼 그리기
+        pygame.draw.rect(screen, (0, 255, 0), done_button_rect)
+        font = pygame.font.SysFont(None, 40)
+        done_text = font.render("Done", True, (0, 0, 0))
+        screen.blit(done_text, (340, 510))
+
+        pygame.display.update()
+
+def main():
+    character_selection()
+
+if __name__ == "__main__":
+    main()
