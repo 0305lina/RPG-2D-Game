@@ -16,6 +16,7 @@ import pygame
 # ''')
 # conn.commit()
 
+
 # 캐릭터 정보 조회 예시
 # cursor.execute('SELECT * FROM character')
 # result = cursor.fetchall()

@@ -73,9 +73,9 @@ while SB == 0:
             if event.key == pygame.K_SPACE:
                 SB = 1
     screen.fill(black)
-    # font = pygame.font.Font("C:/Windows/Fonts/BMDOHYEON_ttf.ttf", 15)
-    # text = font.render("PRESS SPACE KEY TO START THE GAME", True, (255,255,255))
-    # screen.blit(text, (40, round(size[1]/2-50)))    
+    font = pygame.font.SysFont("arial", 15, True, True)
+    text = font.render("PRESS SPACE KEY TO START THE GAME", True, (255,255,255))
+    screen.blit(text, (40, round(size[1]/2-50)))    
     pygame.display.flip()
 
 # 4. 메인 이벤트
@@ -193,7 +193,7 @@ while SB == 0:
     for a in a_list:
         a.show()
         
-    font = pygame.font.Font("arial", 20)
+    font = pygame.font.SysFont("arial", 20)
     text_kill = font.render("killed : {} loss : {}".format(kill, loss), True, (255,255,0))
     screen.blit(text_kill, (10, 5))
     
@@ -209,7 +209,7 @@ while GO == 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             GO = 0
-    font = pygame.font.Font("arial", 40)
+    font = pygame.font.SysFont("arial", 40)
     text = font.render("GAME OVER", True, (255,0,0))
     screen.blit(text, (80, round(size[1]/2-50)))
     pygame.display.flip()
