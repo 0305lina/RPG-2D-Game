@@ -8,10 +8,10 @@ from datetime import datetime
 pygame.init()
 
 # 2. 게임창 옵션 설정
-size = [400, 900]
+size = [400, 700]
 screen = pygame.display.set_mode(size)
 
-title = "My Game"
+title = "Space Game"
 pygame.display.set_caption(title)
 
 # 3. 게임 내 필요한 설정
