@@ -202,7 +202,7 @@ def new_game():
             pygame.draw.rect(screen, black, ship3Border, 2)
         
         screen.blit(userNamePrompt, ((screen_width - userNamePrompt.get_width()) / 2, (screen_height * .20) + userNameSurface.get_height()))
-        screen.blit(characterChoicePrompt, ((screen_width - characterChoicePrompt.get_width()) / 2, screen_height * .35))
+        screen.blit(characterChoicePrompt, ((screen_width - characterChoicePrompt.get_width()) / 2, screen_height * .45))
         
         #Choose your Character Pictures
         screen.blit(pygame.transform.scale(ship1, (100,100)), (screen_width * .045, screen_height * .55))
