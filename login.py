@@ -1,5 +1,6 @@
 import sys
 import pygame
+import shelve
 
 # Initializing
 pygame.init()
@@ -25,6 +26,9 @@ black = (0, 0, 0)
 
 # Load Images
 space = pygame.image.load("space_start.jpg")
+
+# Shelve Instance to save and load data
+S = shelve.open("User Info")
 
 
 # Function to create a button
@@ -79,14 +83,14 @@ def login():
         newButton = create_button((screen_width / 2) - 100, int(screen_height * .33), 200, 50, lightgrey, slategrey)
         
         if newButton:
-            new_game()
+            new_user()
             
         screen.blit(newText, ((screen_width / 2) - (newText.get_width() / 2), int(screen_height * .33)))
         
         returnButton = create_button((screen_width / 2) - 100, screen_height / 2, 200, 50, lightgrey, slategrey)
         
         if returnButton:
-            print("Return Button is clicked.")
+            returner_game()
         
         screen.blit(returnText, ((screen_width / 2) - (returnText.get_width() / 2), screen_height / 2))
         
@@ -98,7 +102,7 @@ def login():
         pygame.display.update()
         clock.tick(60)
         
-def new_game():
+def new_user():
     startText = font.render("Space Game", True, slategrey)
     newUserName = ""
     
@@ -113,6 +117,7 @@ def new_game():
     ship1 = pygame.image.load("ship1.jpg")
     ship2 = pygame.image.load("ship2.jpg")
     ship3 = pygame.image.load("ship3.jpg")
+    submit = font.render("SUBMIT", True, blackish)
     newShip1 = pygame.transform.scale(ship1, (100,100))
     newShip2 = pygame.transform.scale(ship2, (100,100))
     newShip3 = pygame.transform.scale(ship3, (100,100))
@@ -178,6 +183,7 @@ def new_game():
             pygame.draw.rect(screen, white, ship1Border, 2)
             ship2Active = False
             ship3Active = False
+            characterChoice = "X-18 Argonaut"
         else: 
             ship1name = smallfont.render("X-18 Argonaut", True, slategrey)
             pygame.draw.rect(screen, black, ship1Border, 2)
@@ -188,6 +194,7 @@ def new_game():
             pygame.draw.rect(screen, white, ship2Border, 2)
             ship1Active = False
             ship3Active = False
+            characterChoice = "ISS Ravana"
         else: 
             ship2name = smallfont.render("ISS Ravana", True, slategrey)
             pygame.draw.rect(screen, black, ship2Border, 2)
@@ -197,6 +204,7 @@ def new_game():
             pygame.draw.rect(screen, white, ship3Border, 2)
             ship2Active = False
             ship1Active = False
+            characterChoice = "Infinity Nexus"
         else: 
             ship3name = smallfont.render("Infinity Nexus", True, slategrey)
             pygame.draw.rect(screen, black, ship3Border, 2)
@@ -216,6 +224,146 @@ def new_game():
         screen.blit(pygame.transform.scale(ship3, (100,100)), (screen_width * .7, screen_height * .55))
         # screen.blit(ship3, ((screen_width - ship3.get_width()) * .9, screen_height * .45))
         screen.blit(ship3name, ((screen_width + ship3name.get_width()) * .6, screen_height * .80))
+        
+        submitButton = create_button((screen_width / 2) - (submit.get_width() / 2) - 5, screen_height * .9, submit.get_width() + 10, submit.get_height(), lightgrey, slategrey)
+        
+        screen.blit(submit, ((screen_width / 2) - (submit.get_width() / 2), int(screen_height * .9)))
+        
+        if submitButton:
+            if newUserName != "":
+                userName = newUserName
+                S['user_name'] = userName
+            else:
+                print("Need to program user warning")
+            S['character_choice'] = characterChoice
+            S.close()
+            pretest_page(userName, characterChoice)
+                
+        pygame.display.update()
+        clock.tick(60)
+        
+
+def returner_game():
+    # Declare Variables
+    S = shelve.open("User Info")
+    startText = font.render("Welcome Back!", True, slategrey)
+    
+# Need to create a for loop for multiple user info(11:59)
+    try:
+        userName = S['user_name']
+        characterChoice = S['character_choice']
+    except KeyError:
+        userName = "No User Data Saved"
+        characterChoice = "No Character Saved"
+    S.close()
+    profileActive = False
+    startGame = font.render("Go to My Profile", True, blackish)
+    
+# Need to create dynamic Border for multiple profile    
+    profileBorder = pygame.Rect(15, 80, 200, 40)
+    
+    while True:
+        screen.fill((0, 0, 0))
+        screen.blit(startText, ((screen_width - startText.get_width()) / 2, 20))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+                
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if profileBorder.collidepoint(event.pos):
+                    profileActive = True
+                else:
+                    profileActive = False
+                    
+        if profileActive:
+            welcomeName = midfont.render("User ID: " + userName, True, white)
+            # welcomeCharacter = midfont.render("Space Ship: " + characterChoice, True, white)
+            pygame.draw.rect(screen, white, profileBorder, 2)
+        else:
+            welcomeName = midfont.render("User ID: " + userName, True, slategrey)
+            # welcomeCharacter = midfont.render("Space Ship: " + characterChoice, True, slategrey)
+            pygame.draw.rect(screen, black, profileBorder, 2)
+            
+        screen.blit(welcomeName, (20, 90))
+        # screen.blit(welcomeCharacter, (20, welcomeName.get_height() + 80))
+        
+        submitButton = create_button((screen_width / 2) - (startGame.get_width() / 2) - 5, screen_height * .9, startGame.get_width() + 10, startGame.get_height(), lightgrey, slategrey)
+        
+        screen.blit(startGame, ((screen_width / 2) - (startGame.get_width() / 2), int(screen_height * .9)))
+
+# Add user Handling
+        if submitButton:
+            # if userName == "No User Data Saved": DON'T LET USER go to next page (maybe return to newuser/returner page?)
+            main_page(userName, characterChoice)
+        
+        pygame.display.update()
+        clock.tick(60)
+    
+
+def pretest_page(userName, characterChoice):
+    startText = midfont.render("PRETEST", True, slategrey)
+    
+    # Declare Variable
+    welcomeName = midfont.render("User ID: " + userName, True, slategrey)
+    welcomeCharacter = midfont.render("Space Ship: " + characterChoice, True, slategrey)
+    
+    startGame = font.render("Start Pretest", True, blackish)
+    
+    while True:
+        screen.fill((0, 0, 0))
+        screen.blit(startText, ((screen_width - startText.get_width()) / 2, 20))
+        
+        screen.blit(welcomeName, (20, 60))
+        screen.blit(welcomeCharacter, (20, welcomeName.get_height() + 60))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+                
+        submitButton = create_button((screen_width / 2) - (startGame.get_width() / 2) - 5, screen_height * .9, startGame.get_width() + 10, startGame.get_height(), lightgrey, slategrey)
+        
+        screen.blit(startGame, ((screen_width / 2) - (startGame.get_width() / 2), int(screen_height * .9)))
+        
+        if submitButton:
+            # game_page(userName, characterChoice)
+            print("Start the Pretest game")
+                
+        pygame.display.update()
+        clock.tick(60)
+
+# main_page = profile page       
+def main_page(userName, characterChoice):
+    startText = midfont.render("MY PROFILE", True, slategrey)
+    
+    # Declare Variable
+    welcomeName = midfont.render("User ID: " + userName, True, slategrey)
+    welcomeCharacter = midfont.render("Space Ship: " + characterChoice, True, slategrey)
+    
+    startGame = font.render("Start Game", True, blackish)
+    
+    while True:
+        screen.fill((0, 0, 0))
+        screen.blit(startText, ((screen_width - startText.get_width()) / 2, 20))
+        
+        screen.blit(welcomeName, (20, 60))
+        screen.blit(welcomeCharacter, (20, welcomeName.get_height() + 60))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+                
+        submitButton = create_button((screen_width / 2) - (startGame.get_width() / 2) - 5, screen_height * .9, startGame.get_width() + 10, startGame.get_height(), lightgrey, slategrey)
+        
+        screen.blit(startGame, ((screen_width / 2) - (startGame.get_width() / 2), int(screen_height * .9)))
+
+# Solve the error(버튼이 자동 클릭됨)
+        if submitButton:
+            # game_page(userName, characterChoice)
+            print("Start the main game")
                 
         pygame.display.update()
         clock.tick(60)
